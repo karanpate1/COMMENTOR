@@ -1,0 +1,273 @@
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMMENTOR | Analysis Report</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Outfit:wght@300;400;500&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- THEME VARIABLES (MATCHING INDEX.HTML) --- */
+        :root {
+            --bg-color: #050505;
+            --text-main: #ffffff;
+            --text-dim: #777;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-green: #00ff41;
+            --font-title: 'Unbounded', sans-serif;
+            --font-ui: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* --- GLOBAL SETUP --- */
+        body {
+            font-family: var(--font-ui);
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- AMBIENT GLOW BACKGROUND --- */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 800px; height: 800px;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0) 70%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 25px 40px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+        
+        h1 span {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-left: 15px;
+            font-weight: 400;
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 30px;
+            gap: 20px;
+        }
+
+        .col {
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* Column Widths */
+        .col-1 { flex: 0 0 300px; }
+        .col-2 { flex: 0 0 350px; }
+        .col-3 { flex: 1; background: rgba(0,0,0,0.2); } /* Slightly darker for contrast */
+
+        h2 {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            
+            /* STICKY HEADER FIXES */
+            position: sticky; 
+            top: 0;
+            z-index: 10; /* Keeps it above scrolling text */
+            
+            /* Solid background to hide text behind it */
+            background: rgba(5, 5, 5, 0.95); 
+            backdrop-filter: blur(5px);
+            
+            /* Spacing adjustments to make it look seamless */
+            border-bottom: 1px solid var(--glass-border);
+            padding-top: 10px;
+            padding-bottom: 15px;
+            margin-top: -10px; /* Pulls it up slightly to cover top gap */
+            margin-bottom: 20px;
+        }
+
+        /* --- CARDS (TOPICS) --- */
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 18px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(4px);
+        }
+
+        /* ACTIVE STATE (The "Neon Green" Touch) */
+        .card.active {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        .card b {
+            display: block;
+            margin-bottom: 6px;
+            color: #f0f0f0;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .card small {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+        }
+
+        /* --- BUBBLES (COMMENTS) --- */
+        .bubble {
+            background: transparent;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 2px solid var(--glass-border);
+            color: #ddd;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: 0.2s;
+        }
+        
+        .bubble:hover {
+            border-left-color: var(--neon-green);
+            background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+        }
+
+        .placeholder-text {
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 100px;
+            opacity: 0.5;
+        }
+
+        /* --- SCROLLBARS --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    </style>
+</head>
+<body>
+    
+    <header>
+        <h1>COMMENTOR <span>// REPORT DASHBOARD</span></h1>
+    </header>
+
+    <div class="container">
+        <div class="col col-1" id="global-list">
+            <h2>Detected Topics</h2>
+        </div>
+
+        <div class="col col-2" id="sub-list">
+            <h2>Sub-Contexts</h2>
+            <div class="placeholder-text">&lt; Select a Topic to explore</div>
+        </div>
+
+        <div class="col col-3" id="comment-list">
+            <h2>Raw Comments</h2>
+            <div class="placeholder-text">Waiting for selection...</div>
+        </div>
+    </div>
+
+    <script>
+        const data = [{"id": 0, "title": "LavdaKaQueen Support", "count": 18, "sub_clusters": [{"id": "0-0", "title": "General / Main Topic", "count": 18, "comments": ["https://youtu.be/EDaENkoIXRE", "#lavdakaqueen..... True", "#LavdaKaQueen", "#LavdaKaQueen \u2764", "#Lavdakaqueen", "#lavdakaqueen", "#Justiceforchess", "#LavdaKaQueen samay op,,,,, \u2764\ufe0f", "#lavdakaqueen\ud83d\ude02\ud83d\ude02", "#lavdakaqueen", "#lawdakaqueen \ud83d\udd25\ud83d\udd25\u2764\ufe0f\u2764\ufe0f", "#LawdakaQueen", "#lavdekaqueen", "lavdakaqueen\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "#lavdakaqueen \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "#LavdaKaQueen\ud83e\udd23\ud83e\udd23", "#LavdakaQueen", "#LavdaKaQueen"]}]}, {"id": 1, "title": "Lavdeka Exam Jokes", "count": 32, "sub_clusters": [{"id": "1-0", "title": "General / Main Topic", "count": 16, "comments": ["Carzzzy bruh\u2764\u2764", "BC ganier", "Again Garnier \ud83d\ude2d\ud83d\ude2d", "Eee ta tutur phutur \ud83d\ude02\ud83d\ude02\ud83d\ude02", "\u0905\u0938\u0932\u0940 \u092e\u0947 lagh \u0917\u090f", "#laudekaexam \ud83d\ude02", "#LavdaKaGarnier", "#LavdeKaPremiere", "#LavdaKaPremier", "Laure ka exam", "#laudekapremier", "#LAUDE.KA.PREMIER.OP", "#LavdeKaPremier\ud83d\ude02\ud83d\ude02\ud83d\ude02", "#lavdekapremiere", "#lavdekapremier", "#LaudeKaCommentSection \ud83d\ude2c"]}, {"id": "1-1", "title": "LaudaKaExam humor prevalent", "count": 16, "comments": ["#lavdekaexam\ud83d\ude02\ud83d\ude02", "#Lavdekaexam", "#LavdaKaExam", "#lavdekaexam", "https://youtu.be/1XvLcBHiPlA", "#lavdakaexam", "Last rook move....\"weeee\"", "#cancelboardexams", "LaudaKaExam", "Most funny part #lavdakaquin", "#CANCELBOARDEXAMICSE2021", "#lavdekaexam\ud83d\ude02\ud83d\ude02", "Lavdakaexam", "\ud83d\ude02\ud83d\ude02samay career highlight \"lawde\"", "Expected baka mitai", "#lavdakavideo \ud83d\udc7d\ud83d\udc7d"]}]}, {"id": 2, "title": "OP Editing", "count": 15, "sub_clusters": [{"id": "2-0", "title": "General / Main Topic", "count": 15, "comments": ["Editor OP", "Editor OP", "#\ud83d\udc51KA\ud83c\udf4cKA\ud83d\udc51", "OP", "Editor OP", "Op editor", "Ending OP", "Hitler OP", "OP editing \ud83d\ude02\ud83d\ude02\ud83d\ude02", "Op", "haha", "Op\u2764\ufe0f", "error op", "Nicee", "Early op"]}]}, {"id": 3, "title": "Chess Analysis Needed", "count": 411, "sub_clusters": [{"id": "3-0", "title": "General / Main Topic", "count": 7, "comments": ["Samay \ud83e\udd1d Tiger Shroff", "Tiger shroff op", "tiger shroff op", "Tiger Shroff part is best", "Collaboration With Tiger Shroff\ud83d\ude02", "Tiger Shroff op", "Tiger Shroff op"]}, {"id": "3-1", "title": "Newbie seeks explanation, others find confusing.", "count": 404, "comments": ["Multitasking kay naam pr video daikhtay hoay chess khel rhi ti, blundered my fckin queen \ncra-zy cra-zy", "0:59 esssshhh ahhhh", "Bhai 2025 me abb queen margai", "bad editing", "10:52 I am new to chess can someone please explain what happened here ?", "9:40 hitler \u2620\ufe0f", "4:48 ExCuSe Me \ud83e\udd23\ud83e\udd23", "BM:- Bhand Master\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Vaibhav , please stop playing chess!", "3:10 this aged well \ud83d\udc80", "Vo queen bhe mar gai ba \ud83d\ude02", "4:48 \ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23", "3:10 not anymore", "1:50 scout bhai bgmi nhi hai ye ki kahi bhi ghus ke enemy mardoge or enemy dekh ta hi rhega \ud83d\ude02", "3:09 Bhai queen sch mei mar gai", "Vaibhav is not loyal to his queen \ud83e\udd23\ud83e\udd23\ud83d\ude02\ud83d\ude02", "Whenever Sagar said they are playing beautifully and then they f*ck up", "3:10 not anymore", "Haryana gambit on the board", "From blundering queen to defeating samay in cob. Vaibhav came a long way", "Hitler samay can't hurt you\nLe hitler samay- 9:41", "This was total trauma for Sagar Shah \ud83d\ude02", "2:32 Samay predicted it way before \nQueen died", "Vaibhav botez", "last,.. cant believe its a 10 min  vid... too funny\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83d\udc9e\ud83d\udc9e\ud83d\udc9e\ud83d\udc9e", "3:11 this did not age well", "Bro queen reallly died!!!!!!", "3:04 relevant hogya joke abh", "3:10 not anymore", "3:11 not anymore", "9:42  hit/er reference \ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83d\ude2d", "here after queen mar gayi", "YE VAIBHAV KO APNI QUEEN PASAND HEE NHI HAI \ud83d\ude02\ud83d\ude02\ud83d\ude02", "I am assuming that vissy ananad ,hikaru, magnus are casting these games \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "How many queen blunders are there in this tournament?\nComedians: Yes", "Queen mar gaye", "3:06 is irrelevant now\ud83d\ude02", "3:06 bhai queen sach me mr gai \ud83d\udc80\u2620\ufe0f", "Now queen has really died \ud83e\udd23\ud83e\udd23\ud83e\udd23", "Queen tho mar gai.", "Watching it now when queen sach mein mar gayi.", "queen actually mar gayi don't RIP", "Me watching that queen joke in 2022", "3:10 well well well", "I am from future Queen is dead \ud83d\ude2d\ud83e\udd7a", "Rip queen", "3:10 jokes on you\ud83d\ude0f", "Update : Queen actually died a couple of weeks ago", "3:11 Sagar bhai knew things way ahead of his time", "3:04 Sagar Sir prediction *100", "Nhi bro ab to queen mar gye \ud83d\ude2e\u200d\ud83d\udca8\ud83d\udc93", "Bhai queen margayi \ud83e\udd23\ud83d\udda4", "3:09 Abhi am Zinda hai \ud83d\udc80\ud83d\uddff", "The Queen is dead now\ud83d\ude02\ud83d\ude02", "3:11 and here I'm! Queen sachi m margayi", "3:05 is too relevant rn \ud83d\ude02\ud83d\ude02\ud83d\ude02", "3:07 Sagar shah predicted it way earlier!!!!!", "Watching this after queen Elizabeth's death\ud83d\ude14", "3:09 shayad", "Queen literally mar gye hai", "3:10 Didn't Age Well \ud83c\udf1a\ud83c\udf1d", "Sagar bhai aaise games mat dikha karo heart attack aa jayega lol \ud83d\ude02", "3:11 , sadly this is no more a truth.....", "3:09 Nahi rahi bhai ab Queen", "3:09 accha\ud83e\udd28", "Oh no my queen ", "8:57 sagar sir \ud83e\udd23\ud83d\ude4a\ud83e\udd26", "How they are 1300+ and still missing and blundering like this", "10:46 is game ki ending m kya hua rook move queen blunder kyu hai", "3:10 funniest \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "11:11 min video", "Waiting for future shah commentary on cob", "8:27 why is this here, it was a well thought out sacrifice and not a blunder.", "\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23 comedian are all blind..", "\" Queens blunders on board \"", "Queen Mar gayi...\ud83d\ude36\ud83d\ude36\ud83d\ude36\ud83d\ude36", "4:48\neditor op bhai didnt expect this XDXD", "3:12\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "9:33 this was just\ud83e\udd23\ud83e\udd23\ud83e\udd23", "Sagar shah scared me in the start of the video \ud83d\ude11", "8:31 abish realises that he too have an IQ of 220\ud83d\ude0e\ud83d\ude02", "At 9:56 Nxg6 not really a queen blunder rather an exchange in the end", "Pura video Gali Nahi to last ma Jabar dastika kyu???", "9:45 \ud83d\ude02\ud83d\ude02\ud83d\ude02\nyou speak very gOOOOOOOOOOOOOOOOOOOOO x100", "Samay to oxygen - i don't need you\nOxygen - proof?\nSamay - 6:18 - 6:38", "nhi krni bhai pimples se fight yrr!!!!", "BHAI MUJHE NAHI TRY KARNA GARNIER MEN!", "Noti for this vid came after 5 days", "0:58 was epic \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02 i just can't stop laughing", "Scout farted momo chutney after that.", "9:55 the knight could take queen \ud83d\ude44", "I watched all of them live \ud83d\ude00", "Nahi Karni Bhai pimple se fight", "That excuse me at 4:49 totally loved it just EPIC..........!!!", "Best part was Vaibhav's iheihieheiemmm \ud83d\ude02\ud83d\ude02\ud83e\udd23", "GOD SAVE THE QUEEN\ud83c\uddfb\ud83c\uddec\ud83c\uddfb\ud83c\uddec\ud83c\uddfb\ud83c\uddec", "Apparently, this was COB \"All stars\"", "omg hilarious \ud83d\ude02\ud83d\ude02\ud83e\udd23", "What happened in last", "Yeh Garnier meri Jaan lega", "4:48 that got me", "When u think it FAMILY FRIENDLY AND PLAYED THE ENDING IN FRONT OF MY DAD \u2639\ufe0f", "4:30 \"But I really like this game..\" :)", "9:45 is Really epic.........", "2:11 WTF TANMAY??!!!", "Scout is not a comedian", "Yar ye pimple add", "O raja raja raja \ud83d\ude02", "Inspired by Gary Kasparov 1995 wc queen blunder against Vishy Anand", "Hanging pieces coming", "Excuse me placement was too op\ud83d\ude02\ud83d\ude02", "5:51 every Spurs fan right now", "4:51 excuse me... editor op in the chat", "2:51 Tanmay for a minute be like aare kya kar diya maine kiska murder kar diya \ud83d\ude36", "I can literally tell this video is edited by billu", "The journey from standup to chess by Samay < The journey from football to chess by Jos\u00e9 Mourinho", "I see... Tiger Shroff is also regular here\ud83d\ude02", "tiger shroff reference explain kardo bhai koi please", "It's not queen blunder it's a \"highly confident Botez Gambit\"", "Editor bhai pura video itna acha edit karke end main tune kyun haga be", "Ye tiger Shroff har bar tumhare sath Collab kaise kr leta hai!!!!", "\"you speak very gooooooooooooo queen blunder\" \n                                                            -sagar shah 2021", "That's 'scuse me killed me\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Bhai bas tere video pe Garnier ki ad q ati hai", "Queen Blunders or as they say in chess Offerings to the legend GM Abish Matthew", "Award for most queens blundered goes to tiger Shroff .\nMr. Bali has taken disha patani.", "6:04 commentary by BM Samay Raina", "Sagar sir reactions are too good", "This has a serious lack of \"Baka Mitai\"", "QUEEN BE LIKE:- Meri koi feeling nhi kya kru...me mrjaoo", "Did Billu get fired \ud83e\udd14\ud83e\udd14 Somehow this does not seem like Billu's editing ... videos in 2020 used to be way more funnier than this..full of memes", "When ever i see my siblings\nMe to my parents in my mind:- 5:47", "Escuse me lmao", "editor bhai tum mast kam krta hai", "Kar li pimples se fight??\ud83d\ude02", "Bhai.... Tiger Shroff ko comedian bulana kuch logon ko offend kar sakta hai", "3:09 \nI understood the reference. \nRIP prince Philips", "Vaibhav: (Move the King)x2\nMe: Nahi krega vo move \nSuddenly Tiger shroff enters\ud83d\ude02", "11:09\nNO\nPLS NO\nIT CAN ONLY WITH EXAM\n#LAVDAKAEXAM", "6:17\nRap God's slower version\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "https://youtu.be/WreDv51uIVE\nYou guys wont believe this actually happened", "If Queen sacrifice is an art the Vaibhav is Picaso of it.", "Last wale edit k liye ek like banta hai", "*No bell* piece prize goes to *VAIBHAV SETHIA*.    Great content", "3:07 anybody noticed??? :)", "9:42 was a knight blunder not queen blunder", "Garnier man face wash", "Samay bhai tu tiger hai , roar samay roar .", "Does Vaibhav have some problems with his wife?", "Just bought garnier men acno fight facewash", "queen blunder and vaibhav sethia are intertwined for eternity.", "that queen elizabeth edit was amazing\ud83d\ude02\ud83d\ude02", "*\u201cKarni hai pimple se fight to soap kyu?\u201d*", "The thumbnail has Suhani in the middle with queen's crown on her head. Hmmm... we have taken the hint samay! <3", "9:39 Okay so are we gonna ignore that freaking hitler made a appearance", "\"Karni hai pimples se fight?\"", "Bewafa samay 2.0 by mamaearth coming soon", "we all blunder our queen once in our life.", "Whenever I click samays video :- germs and oils.....", "Including Suhani in comedians,u wanna say that suhani is doing comedy in the name of magic \ud83d\ude02", "Chess ham sharminda hai, teri kaatil zinda hai.", "Ohhhhhhhhhhh myyyyyyyyyyyy gaawwwwwwwwwwwwwwwwwwwwwddddddddddd - Sagar Shah 2021\ud83d\ude02", "Samay and tiger shroff are on a race to see who promotes their brands the best\ud83d\ude02\ud83d\ude02So now i am using garnier men facewash instead of mamaearth\ud83d\ude02\ud83d\ude02", "In whole COB All Stars - Queen was like bc humari koi ijjat hi nai hai kya \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02 Epic Queen Blunders\ud83d\ude4f\ud83d\ude4f\ud83d\ude02\ud83d\ude02", "Me when my father taunts me for no reason at all 5:45", "Kya tiger shrof ki bas ad dekh ke video leave kiya toh views samay ko jayenge ki nahi?", "BOB :- Blunder on Board", "Ye tiger k video k bich bich me samay ka ad kyu aata hai", "9:04  Hasde chehreya da matlab eh naii hunda ki ohna nu ki takleef nhi hundi \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Waiting for award ceremony", "Queen is more disrespected than the Ghoda", "Ravi kishan : AAY KYA KUSUL PUSUL...", "1:24 when I tell my friends my crush replied to my Instagram story", "9:41 Heil Scamay \u270b\ud83c\udffb", "Nahi karni he mere ko fight bhai me original soap chala lunga bas ab bandh karo ye kal sapne me bhi sala yahi ata he pimple se karo fight nahi karna ...", "Guys I think #LavdaKa_________ is the best hashtag even better than cancel board exam", "Samay: 6:03 - 6:35\nMe: Arey Eminem! \ud83d\ude02", "09:41 \ud83d\ude33\ud83d\ude33", "Germs aur oil ab mere sapne me aate hai", "9:42 Damn! So accurate \ud83d\ude02", "Ye \"Garnier Men Acno Fight Face wash\" ki itni sari adds kyu aati hai?", "Nahi karni pimples se fight \ud83d\ude2d\ud83d\ude2d\ud83d\ude2d\ud83d\ude2d", "3:31 bhai bhai bhai bhai heart attack na aa jaye bs XD", "9:54 there is Ng6", "6:11 samay says 'What a turn around' \nAnd editor rotates his facecam\ud83d\ude02\ud83d\ude02\ud83d\ude02\nEditor OP\ud83d\ude02\ud83d\ude02\u2764\ufe0f", "Samay as Hitler was the funniest shit 9:41", "Somewhere Eric Rosen: oh no my queen.! But literally.", "Aakash vaala edit = \ud83d\ude02\u2764\ufe0f\u2764\ufe0f\ud83d\udd25\ud83d\udd25", "6:20 Arey Eminem", "Can we take a moment and appreciate tiger shroff for his appearance in every video", "Blunders are temporary...\n\n\n\n\n\n'Germs aur oil' is permanent", "I am sure everyone wanted this video", "Whoever is editing the videos nowadays, good job!", "Only Sagar shah and tiger shroff in this video didnt blunder their queen.", "Saimay bhai ICSE k liye bhi kuch bol to ham bhi khus hojaye", "alternative title.....\nsagar shah regreting for 11 min straight\ud83d\ude02\ud83d\ude09", "Queen ko das rupaiye mein beech do", "videos will be different but germs or oil is constant", "4:42 - 4:48\n\nBro'ther....\u2764\ufe0f\ud83d\udc51", "Bc itni ad dekhli h abh mere sath sath kisi ko pimple ni hore", "Agar queen blunder ka compilation ban raha hai to iss event ko All Stars to nahi keh sakte", "Tiger shroff will also blunder queen disha", "Kangna ranaut incoming. \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Thanks for 8 subs plz 15 karwado", "Girls after scoring 98/100 : \ud83d\ude2d\ud83d\ude2d\nBoys after blundering their queen in CoB: 3:37", "Likha comedians hai\nPar dikha mujhe sirf \nVaibhav Sethia", "Moment of silence for fallen queens", "Excuse me\ud83d\ude02\ud83d\ude02\ud83d\ude02", "'Someone blunders queen'\nSagar Shah: \ud83d\ude4a", "12th students right now : 11:06", "A re samay bhai aap kya Garnier ke brand ambassador ho kya? Sala 11 minute ke vedio mai 5 minute ka sirf  \"germs aur oil ,germs aur oil\" hi chal raha tha #lavdekagarnier", "Bhai apne title ke end mein koi hint daal diya karo 18+ ya with parents ki!!\nlike a green circle or something like that!", "BREAKING NEWS: Stockfish found dead after analyzing these games", "Don't do this in the name of chess \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "bhai ye garnier ki add bandh kar", "This wouldn\u2019t be successful without Sagar bhai \u2764\ufe0f", "4:48 the excuse me was just too funny\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "3:09 i m liking for this", "People blundering queens in COB All Stars.\n*Me who blunder checkmates*\nHaa NOOOB!", "Just sad, that there are so many queen blunders, and not a single King blunder", "Ye saare ek janam ke hai ??\ud83d\ude02\ud83d\ude02", "Petition to cancel SSC exam.. #lavdakaexam", "Vaibhav is the prime advertiser of Botez Gambit in India \ud83d\ude02", "Who else would like to see a sub battle between samay and levy\ud83d\ude01\ud83d\ude01\ud83d\ude01", "Samay, we want compilation of all Sagar Shah's analogies during the matches \ud83d\ude4f \nMatlab kya hi situations explain karte hai.. too good \ud83d\udd25\ud83d\ude02", "4:48\n \nThat Aakash Gupta's \"EXCUSE ME\"\n\n\ud83d\ude02\ud83d\ude02", "Me to my son in future.. believe me.. this was COB all stars. \ud83d\ude39\ud83d\ude39\ud83d\ude39\ud83d\ude39", "imagine getting a heart from samay bhai din ban jaaega\ud83d\ude0d", "5:45  12th Students who were expecting boards to be cancelled instead of postponing", "It was vaibhav's blunder", "Bhai galti sa bina headphone ka video dikha", "i want abish mathew first in cob 69", "The editor is a person of class. Putting in Jose Mourinho \ud83d\ude02", "Why does it look like anirban is crying always?", "Blundering queen compilation or we can sae botez Gambit compilation", "\"Oh no, my queen\"", "For some reason tiger shroff didn't come today did something happen between Samay and tiger!", "There must be a botez gambit award in the next cob", "And Sagar said they have reached a level where even pawn up is a significant advantage.", "Unsubbing coz of GERMS aur OIL \ud83d\ude20\ud83d\ude20\ud83d\ude20 never watching anything with Tiger Shroff in it \ud83d\udca9\ud83d\udca9\ud83d\udca9.....unless theres Disha Patani in it \ud83d\ude0d\ud83d\ude0d\ud83d\ude0d", "Where is sumit vs vaibhav vale blunders those were epic legit queen blunder!", "Legends had watched everything on livestream", "That Hitler face on samay\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Did Samay edit this video!", "Yrr that Maine Hagg Diya \ud83d\ude02\ud83d\ude02", "Finally Susha qualified to be a comedian\ud83e\udd23\ud83e\udd23 after that title", "Vaibhav was in almost all clips \ud83d\ude02\ud83d\ude02\ud83d\ude02", "Next compilation must be of sagar's analogies ft. Tigershroff", "Best compilation ever of COB by far , really loved it, amazing work Samay and Sagar , keep on this amazing work lots of love and support \ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95\ud83d\udc95", "Just 1 min down the video and cannot stop laughing already\ud83e\udd23", "Ohk so this is the high quality chess we were promised to get. \ud83d\ude02\ud83d\ude02\ud83d\ude02", "Ending is so good\ud83d\ude02\ud83d\ude02", "Most queen blunder done by vaibhav sethia", "I was so happy not to see samay blundering the queen for the entire video but i forgot that he is a legendary BM\ud83d\ude02\ud83d\ude1c", "6:35 are bhai bhai bhai \ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "COB 3 - samay : I am the biggest blundermaster\nCOB all stars -Vaibhav :Ruko jara sabar karo", "Petition to cancel mama earth sponsorship and Apply for Garnier sponsorship.", "Finally blunder Master came with Blunder compilation", "Title be like:- ART OF QUEEN SACRIFICE feat Vaibhav sethia", "0:49 queen blunder ko maaro goli. How is black winning this being 1 complete piece down\ud83d\ude02. Wow.", "oh no oh no germs and dust", "SAGAR BHAI : OH NO QUEEN,\"karni hai pimple se fight\"", "Finally Boards Exams are Cancelled .\n#TheSamayRainaEffect\n\ud83d\ude02\ud83d\ude02", "of all places this is the last place i'd expect to see mourinho lol", "4:48 \"Brother Queen\"\ud83d\ude02", "Billu edit mistake at 3:22", "9:40 samay aur samay ka editor dono ko twitter cancel karne walla hai..xD", "Samay bhai maharashtra board ke liye bhi ek nara lagao plz\ud83d\ude2d\ud83d\ude36", "Legends Says : Tanmay is still chewing\ud83d\ude02", "lmfao the prologue WHAT HE BLUNDERED THE QUEEN cudnt stop laughing\nSagar OP", "Compilation of Mutual blindness \ud83d\ude02", "Tiger Shroff and Samay Raina collab has been the news of the year.", "Waiting for Anish Giri's comment..", "Sac Sac Sac F**k", "best compilation", "I'm 2 uploads away from buying you tube premium .....this tiger guy is hitting my nerves", "Nowadays first thing we listen is not welcome, welcome n welcome but it's germs and oil", "4:31 \"But really, I like this game so mu...OOHHH\" \ud83d\ude02", "vaibhav's \"ehehehe\" laughter background sound is too funny kudos to the editor\ud83d\ude02\ud83d\ude02", "Germs and oil killed the QUEEN", "Everyone after queen blunder :\nAUR MAINE HAGGG DIYA", "Maza aata hai yaar TIGER RAINA channel ke videos dekh ke\ud83d\ude42", "Good editing skills, lmfao 2:00", "*Everytime Samay uploads a video*\n\nTiger : \u0915\u0930\u0928\u0940 \u0939\u0948 \u092a\u093f\u092e\u094d\u092a\u0932 \u0938\u0947 \u092b\u093c\u093e\u0907\u091f ??", "I really want samay's editor pls I  mean really plss.", "3 things consistent on samay's channel:-\n\n\n\n\n\nTiger shroff\nTisha Jindal\nSamay\ud83d\ude36", "6:38 This laugh is so good\ud83d\ude02", "10 mins wtf \ud83d\ude02\ud83d\ude02", "8:26 Lovely Moment", "Garnier mens acno fight face wash OP", "Bhai L lag gye ka music director krsna h", "Koi tiger shroff ko golden play button bhejo yaar!", "Petition to make a Garnier compilation", "9:41 dictator SAMAY\ud83d\ude02", "Chess is brutal some times \n                          ~ Sagar Shah", "NAHI KARNI YAAR PIMPLE SE FIGHT!!!", "8:18 \n\nSamay and Sagar Bhai: oh man abish blundered the queen \nGM Abish Mathew : toh Kya huya.. \ud83d\ude02", "where award ceremony", "Garnier men face wash kya mast video banata hai bich bich me samay ke video bhi the", "Thak gaya hu vro ... Tiger Shroff ki ad dekh dekh ke", "Sasta hitler @ 9:40", "Bring Gm Anna Cramling in a stream, please", "\u201cExcuse me\u201d was the highlight for me 4:49 \ud83d\ude02\ud83d\ude02\ud83d\ude02", "One should make the \"Tiger Shroff ad compilation\"..\ud83d\ude02", "Fun fact : samay's sponsorship has ended with mama earth and started with garnier men acno fight face wash .", "Need Sagar Shah Speaking to Chess Pieces compilation.", "Sagar shah itna \" OH MY GOD\" apne suhagraat mein nhi bola hoga", "Why don't we talk about germs and oil?", "Is this a fan made video? Seemed a bit different", "I like how you mentioned comedians in title and Vaibhav Sethia is in the video\ud83d\ude43", "Lol 11 11", "In Samay's video we are seeing more video footage of Tiger Shroff than Samay", "4:48\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "4:52. \n\nThe words that samay is terrified of.", "Vaibhav's reactions are underrated \ud83d\ude02", "That oh my god on 8:39 man", "Samay bhai plss kuch karke garnier ka ad hatao.. \nDimaaag ka santra ho jaa raha hai", "4:48 Bhai Editor op My stomach is paining XD", "Prime reason for samay to conduct cob after promotion of chess in india is that there will be no shortage of content for next 1 month or so", "What a co incidence levy (Gotham chess) uploading greatest queen sac's by super gms and samay uploading queen sac of out bm's on same day \ud83d\ude06\ud83e\udd23", "LavaKaQueen lolll", "Waiting for all the tiger shroff jokes", "Suhani shah is offically a comedian now", "6:17 arey eminem", "I think the compilation should have been named Vaibhav Setia and some comedians blunder queens", "Going to cancel my youtube premium subscription to see tiger \ud83d\ude0e", "Award for most queens blundered goes to Vaibhav Sethia \ud83e\udd47", "Thak gaya hu bro pimples se fight karte krte", "This video is Tribute to all Blunders \ud83d\ude02\ud83d\ude02", "Bhai kashmir se premiere kar rahe the kya? \ud83d\ude44", "11:01 haha that laugh suit vaibhav\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23\ud83e\udd23like evil\ud83d\ude08\ud83d\ude08\ud83d\ude08", "There should be separate compilation of Sagar sir regreting....The moment he says \" He will surely support it / move it / see the threat \" the player blunders it!", "Once we lejends said- #LawdeKaGarnier #LawdeKaPremiere", "excuse me excuse me QUEEN", "#LAVDE KA QUEEN\ud83d\ude02", "thumbnail mein wo queen ko kya sahi place kiya susha pe...", "Wah bhai...\nPaise kamane ke liye garnier ke adds  \ndal diye hai sabhi videos mai..\ud83d\ude02\ud83d\ude02", "9:41 i see what you did there xd", "4:49 \ud83d\ude02\ud83d\ude02", "Tiger Shroff : karni hai germs se fight\nMe : #lavdekafight", "Vaibhav sethia is true fan of Botez gambit !!", "Excuse me brother", "Thkakk gya hooon vro Garnier aur Tiger Shroff ke jokes dkh dkhkr", "10:03 no red bull was harmed in the making of video", "Sagar bhai and Samay's reaction are so amazing its like when a topper gets 98/100 in maths and still crying lol par yaar yeh epic tha bhale lag hua ho premiere the wait was worth it\ud83d\ude02\ud83d\udc9e\nlove you yaar Samay\u2764\u2764", "E raja Raja Raja...kareja me samaja....\u2764\ufe0f\u2764\ufe0f", "tiger shroff actually wants to learn how to play chess from sagar and samay,that's why he comes in every video", "Who is this samay guy? This is tiger shroffs channel i want to see tiger", "BHAI VAIBHAV SETHIA AWARD FOR QUEEN BLUNDER IS THE NEXT TO ENTER THE HALL OF AWARDS", "9:41 That Hitler look\ud83d\ude02\ud83d\ude02", "Lavda is getting famous \ud83d\ude02\ud83d\ude02", "Levy ( Gotham chess) - makes a video on greatest queen sacs of all time.\nSamay- uno reverse card bro.", "8:29 Look at Sagar laughing like that cute little kid who appears in memes. Expected the editor to do something there \ud83d\ude06\u2764\ufe0f", "after such a bad error the premiere ended and it was all good but totally enjoyed the way all of em blundered queen and their reactions were everythingggggg\ud83d\ude02", "Comedians like botez GAMBIT compilation", "bhai samay ka aadha paisa toh tiger shroff lejayega what i mean to say is that tiger shroff aakash gupta hai\ud83d\ude02", "Yesterday's thunder effects is still in action in this premiere", "While watching premier I was thinking that I am in Kishmir for a while.", "PREMIER KYA HEE HAGA\ud83e\udd23\ud83e\udd23\ud83e\udd23", "Only legends know what happened during the premiere \n#errorop\ud83d\ude02\ud83d\ude02", "*Only person who had not blundered queen is - Tiger Shroff* \ud83d\ude02", "Samazh nahi aa raha ki mera net hagg raha hai YouTube\nPuri chat lag spam kar rahi hai", "yaar ye tiger shroff", "saw 3 minutes of the garnier ad, 0 minutes of YouTube premiere...", "At last, germs and oil attacked samay's premiering video and tiger was helpless", "Queen blunder  \u274c\nQueen Sacrifice  \u2714\ufe0f", "Chalo leh chale tumhe blunder keh seher mainn\ud83d\ude02\ud83d\ude02\ud83d\ude02\ud83d\ude02", "Comedians blundering queen \nYouTubers blundering Premieres", "They all blundered the Queen because they were not happy with the Position", "#BoycottGarnier", "Bhai samay mujhe pimples se fight nahi karni . Tu pehle is ad ko hata", "Please Garnier sponsor samay and stop giving ads its damn irritating", "Mera atka ya sabka atka tha?", "what   is this VIDEO is not even PLAYING WTF !!!!", "Deactivated my YouTube premium to see the Samay X Tiger collab", "I don't know why Tiger Shroff is coming in ad, consistently", "Hastag 64", "Waaah bete mauj kardi!", "Title should be \"Comedians and Suhani Shah\" \ud83d\ude02", "Finally the most awaited compilation is here.. \ud83d\ude02", "700 Like was mine Not all 700 but The no \ud83d\ude02", "From SCAMAY'S consistency to TIGER SHROFF'S consistency SAMAY passed 2 weeks of regular uploads.\n*TANMAY BHAT'S PROUD STUDENT*", "Queen disrespected \ud83d\ude02\ud83d\ude02\ud83d\ude02", "I think he meant Queen Sacrifice\ud83d\ude02\ud83d\ude02 \nBcoz these comedians never blunder", "What is suhani doing in the thumbnail?", "Newton school going to launch a job program for all the blundered queens in COB ALL STARS \ud83d\ude02", "Petition to make Sagar Shah's 'OH MY GOD' compilation\ud83d\ude02\ud83d\udc95", "Keep them COB compilations coming \ud83e\udd70", "QUEEN BLUNDER \u274c\u274c\n\n\"KANYA DAAN\"\u2705\u2705\n                                 ~Samay Raina (2021)", "Thumbnail mein Suhani kyu? Wo kab se comedian ban gyi?", "If you take a shot everytime Sagar says OH MY GOD\n\n\n\n\n\n\n\nYou will be drunk enough to make a video on postponement of exams by advising everyone to write LAVDE KA EXAM", "\u0906\u092a \u0938\u092d\u0940 \u0915\u094b \u092c\u093e\u0939\u093e\u0917 \u092c\u093f\u0939\u0942 \u0915\u0940 \u0939\u093e\u0930\u094d\u0926\u093f\u0915 \u0936\u0941\u0915\u093e\u092e\u0928\u093e\u090f\u0902 \u0964", "The queen's crown is in the absolutely right place in the thumbnail... \ud83d\udc51\ud83d\ude0a", "Rook blunder by Biswa>all the queen blunders combined", "Message~Never Blunder Your Queen In Reality It Will Destroy Your Life Like In Chess Game...........", "Everyone blundering their queen \ud83d\udc51 and giving it away but I still can't get over the rook blunder followed by an epic comeback by Samay\u2764\ud83d\udcaf", "Who all r here to see tiger shroff \ud83d\ude02\ud83d\ude02", "Aaj It takes two nahi kheloge ?", "Kr$na bhi hona chahiye", "Its going to be different sounds \ud83d\udd0a\ud83d\udd0afrom sagar shah ... during cob all star\n\ud83e\udd23\ud83d\ude01", "Lavda ka video hai <3", "Featuring the legendary song also from Miniclip 11!", "Sagar Sir's Reactions are best! ", "Bro ek baar 12th kelye specifically video bnade kya pta unka bhi cancel krde"]}]}]; 
+        
+        const gList = document.getElementById('global-list');
+        const sList = document.getElementById('sub-list');
+        const cList = document.getElementById('comment-list');
+
+        data.forEach(g => {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.innerHTML = `<b>${g.title}</b><small>${g.count} comments</small>`;
+            el.onclick = () => loadSub(g, el);
+            gList.appendChild(el);
+        });
+
+        function loadSub(g, card) {
+            // Visual Active State
+            document.querySelectorAll('.col-1 .card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            // Reset Columns
+            sList.innerHTML = '<h2>Sub-Contexts</h2>';
+            cList.innerHTML = '<h2>Raw Comments</h2><div class="placeholder-text">&lt; Select a Sub-Context</div>';
+
+            g.sub_clusters.forEach(s => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.innerHTML = `<b>${s.title}</b><small>${s.count} comments</small>`;
+                el.onclick = () => loadComm(s, el);
+                sList.appendChild(el);
+            });
+        }
+
+        function loadComm(s, card) {
+            // Visual Active State
+            document.querySelectorAll('.col-2 .card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            // Load Comments
+            cList.innerHTML = `<h2>${s.title}</h2>`;
+            s.comments.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'bubble';
+                el.textContent = c;
+                cList.appendChild(el);
+            });
+        }
+    </script>
+</body>
+</html>
+    
