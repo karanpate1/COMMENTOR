@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>COMMENTOR | Decode the noise</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
                 <div class="icon-slot">
                     <svg id="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                 </div>
-                <input type="text" id="smart-input" placeholder="Paste YouTube Link or Drag CSV here..." autocomplete="off">
+                <input type="text" id="smart-input" placeholder="Paste YouTube Link or Drag CSV..." autocomplete="off">
                 <input type="file" id="hidden-file-input" accept=".csv" style="display: none;">
                 <button id="analyze-btn" onclick="triggerAnalysis()" disabled>ANALYZE</button>
             </div>
@@ -42,19 +42,21 @@
         <div class="bottom-ui">
             <div class="demo-dock">
                 <p class="demo-label">ARCHIVED ANALYSES</p>
-                <div class="demo-grid">
-                    <a href="demo1.html" target="_blank" class="demo-card">
-                        <!-- <div class="demo-icon">▶</div> -->
-                        <div class="demo-info"><span class="demo-title">demo1</span><span class="demo-meta">12k Comments</span></div>
-                    </a>
-                    <a href="demo2.html" target="_blank" class="demo-card">
-                        <!-- <div class="demo-icon">🎬</div> -->
-                        <div class="demo-info"><span class="demo-title">demo2</span><span class="demo-meta">45k Comments</span></div>
-                    </a>
-                    <a href="demo3.html" target="_blank" class="demo-card">
-                        <!-- <div class="demo-icon">📊</div> -->
-                        <div class="demo-info"><span class="demo-title">demo3</span><span class="demo-meta">8k Comments</span></div>
-                    </a>
+                <div class="scroll-wrapper">
+                    <div class="demo-grid">
+                        <a href="demo1.html" target="_blank" class="demo-card">
+                            <div class="demo-icon">▶</div>
+                            <div class="demo-info"><span class="demo-title">Tech Review</span><span class="demo-meta">12k Comments</span></div>
+                        </a>
+                        <a href="demo2.html" target="_blank" class="demo-card">
+                            <div class="demo-icon">🎬</div>
+                            <div class="demo-info"><span class="demo-title">Movie Trailer</span><span class="demo-meta">45k Comments</span></div>
+                        </a>
+                        <a href="demo3.html" target="_blank" class="demo-card">
+                            <div class="demo-icon">📊</div>
+                            <div class="demo-info"><span class="demo-title">News/Live</span><span class="demo-meta">8k Comments</span></div>
+                        </a>
+                    </div>
                 </div>
             </div>
             <footer>DESIGNED BY <span class="author-name">KARAN PATEL</span></footer>
@@ -75,8 +77,8 @@
     <div id="result-view" class="hidden">
         <div class="floating-controls">
             <button onclick="resetApp()" class="control-btn icon-btn">←</button>
-            <span class="result-title">ANALYSIS REPORT</span>
-            <button onclick="downloadResult()" class="control-btn text-btn">DOWNLOAD HTML</button>
+            <span class="result-title">REPORT</span>
+            <button onclick="downloadResult()" class="control-btn text-btn">DOWNLOAD</button>
         </div>
         <iframe id="result-frame"></iframe>
     </div>

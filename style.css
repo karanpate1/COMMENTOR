@@ -9,13 +9,11 @@
 }
 
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    height: 100vh;
-    overflow: hidden; /* Prevents scrollbars unless necessary */
+    background-color: var(--bg-color); color: var(--text-main);
+    height: 100vh; width: 100vw;
+    overflow: hidden; /* Lock scroll on desktop */
 }
 
 /* --- BACKGROUND --- */
@@ -31,64 +29,47 @@ body {
     top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -2;
 }
 
-/* --- MAIN LAYOUT CONTAINER (FIX FOR OVERLAP) --- */
+/* --- MAIN LAYOUT --- */
 #landing-view {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column; /* Stack vertically */
-    justify-content: space-between; /* Space out Top, Middle, Bottom */
+    height: 100vh; width: 100%;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
     animation: fadeIn 1s ease forwards;
 }
 
-/* 1. CENTER STAGE (Flexible Middle) */
+/* 1. CENTER STAGE */
 .center-stage {
     text-align: center;
-    flex-grow: 1; /* Takes up all available space */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Vertically center content */
-    align-items: center;
-    position: relative;
-    z-index: 2;
-    padding-bottom: 50px; /* Push slightly up visually */
+    flex-grow: 1; /* Takes available space */
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    position: relative; z-index: 2;
+    padding-bottom: 50px;
 }
 
 .brand-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 800;
-    letter-spacing: 0.8rem;
-    margin: 0;
-    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif; font-size: 4rem; font-weight: 800;
+    letter-spacing: 0.8rem; margin: 0; text-transform: uppercase;
     text-shadow: 0 0 20px rgba(255,255,255,0.1);
 }
 
 .tagline {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-dim);
-    letter-spacing: 0.2rem;
-    font-size: 0.9rem;
-    margin-top: 10px;
-    margin-bottom: 50px;
-    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace; color: var(--text-dim);
+    letter-spacing: 0.2rem; font-size: 0.9rem;
+    margin-top: 10px; margin-bottom: 50px; text-transform: uppercase;
 }
 
-/* 2. BOTTOM UI (Rigid Bottom) */
+/* 2. BOTTOM UI */
 .bottom-ui {
-    width: 100%;
-    flex-shrink: 0; /* Prevents being squashed */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 3;
-    padding-bottom: 20px;
+    width: 100%; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    z-index: 3; padding-bottom: 20px;
     background: linear-gradient(to top, #050505 10%, transparent 100%);
 }
 
 .demo-dock {
     display: flex; flex-direction: column; align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 25px; width: 100%;
 }
 
 .demo-label {
@@ -96,7 +77,9 @@ body {
     color: #444; letter-spacing: 2px; margin-bottom: 12px; opacity: 0.6;
 }
 
-.demo-grid { display: flex; gap: 15px; }
+.demo-grid {
+    display: flex; gap: 15px; justify-content: center;
+}
 
 .demo-card {
     display: flex; align-items: center; gap: 12px;
@@ -106,6 +89,7 @@ body {
     text-decoration: none; transition: all 0.3s ease;
     width: 180px; opacity: 0.4; filter: grayscale(100%);
     backdrop-filter: blur(5px);
+    flex-shrink: 0; /* Important for mobile scroll */
 }
 
 .demo-card:hover {
@@ -153,6 +137,7 @@ footer {
     background: #fff; color: #000; border: none; padding: 12px 25px;
     border-radius: 30px; font-weight: bold; font-size: 0.85rem;
     cursor: pointer; transition: transform 0.2s, background 0.2s;
+    white-space: nowrap;
 }
 #analyze-btn:hover:not(:disabled) { transform: scale(1.05); background: #eee; }
 #analyze-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
@@ -187,9 +172,60 @@ footer {
     background: #000; padding: 10px 20px; border-radius: 50px;
     display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-.control-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.9rem; }
+.control-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 0.9rem; white-space: nowrap; }
 .result-title { color: #666; font-size: 0.8rem; font-family: 'Montserrat', sans-serif; letter-spacing: 1px; }
 
 .hidden { display: none !important; }
 .fade-in { animation: fadeIn 1s ease forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================
+   MOBILE RESPONSIVENESS (Magic Happens Here)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Typography Scaling */
+    .brand-title { font-size: 2.5rem; letter-spacing: 0.3rem; }
+    .tagline { font-size: 0.75rem; margin-bottom: 30px; }
+    
+    /* 2. Omnibar Fit */
+    .omnibar-container { width: 90%; padding: 5px; }
+    #smart-input { font-size: 0.9rem; padding: 0 10px; }
+    #analyze-btn { padding: 10px 18px; font-size: 0.75rem; }
+    
+    /* 3. Center Stage Adjustment */
+    /* Move up slightly to avoid keyboard clash */
+    .center-stage { padding-bottom: 20px; justify-content: flex-start; padding-top: 15vh; }
+    
+    /* 4. Demo Dock -> Horizontal Scroll */
+    .demo-dock { width: 100%; overflow: hidden; }
+    .scroll-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 10px; /* Space for scrollbar */
+        -webkit-overflow-scrolling: touch;
+        /* Hide scrollbar but keep functionality */
+        scrollbar-width: none; 
+    }
+    .scroll-wrapper::-webkit-scrollbar { display: none; }
+    
+    .demo-grid {
+        padding: 0 20px; /* Side padding so first card isn't glued to edge */
+        justify-content: flex-start; /* Align left for scrolling */
+        width: max-content; /* Force width to content size */
+    }
+    
+    .demo-card { 
+        width: 150px; /* Slightly smaller cards */
+        opacity: 0.7; /* Higher opacity on mobile since no hover */
+    }
+
+    /* 5. Result Controls */
+    .floating-controls {
+        width: 85%;
+        justify-content: space-between;
+        gap: 5px;
+        padding: 8px 15px;
+    }
+    .result-title { display: none; } /* Hide title on mobile to save space */
+}
